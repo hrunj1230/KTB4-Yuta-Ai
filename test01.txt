@@ -1,7 +1,3 @@
-<<<<<<< HEAD
 dsffda
 hihihihihihi~~~~!!!
-
-=======
 1~~~~~!!!!!
->>>>>>> sub1

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>게시판</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <div class="top-bar">
+    <h1>게시판</h1>
+    <button onclick="openModal()">글쓰기</button>
+  </div>
+
+  <div class="post-list">
+
+    <div class="post-card" onclick="goDetail(1)">
+      <h3>첫 번째 게시글</h3>
+      <p>안녕하세요.</p>
+    </div>
+
+    <div class="post-card" onclick="goDetail(2)">
+      <h3>두 번째 게시글</h3>
+      <p>FastAPI 재밌다.</p>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- 글쓰기 모달 -->
+<div class="modal" id="modal">
+
+  <div class="modal-content">
+    <h2>글 작성</h2>
+
+    <input type="text" id="titleInput" placeholder="제목">
+    <textarea placeholder="내용" id="contentInput"></textarea>
+
+    <button onclick="addBoard()">작성 완료</button>
+  </div>
+
+</div>
+
+<script>
+getList();
+async function getList() {
+  const res = await fetch("/board/list")
+  const data = await res.json();
+  console.log(data);  // 먼저 데이터가 오는지 확인
+  const postList = document.querySelector('.post-list');
+  postList.innerHTML = '';
+
+  if (!data || data.length === 0) {
+    postList.innerHTML = '<p>게시글이 없습니다.</p>';
+    return;
+  }
+
+  data.forEach(board => {
+    const postCard = document.createElement('div');
+    postCard.className = 'post-card';
+    postCard.onclick = () => goDetail(board.id);
+
+    postCard.innerHTML = `
+      <h3>${board.title}</h3>
+      <p>${board.content}</p>
+      <button onclick="event.stopPropagation(); delBoard(${board.id})">삭제</button>
+    `;
+
+    postList.appendChild(postCard);
+  });
+}
+function goDetail(id) {
+  location.href = `/detail/${id}`
+}
+
+function openModal() {
+  document.getElementById("modal").style.display = "flex"
+}
+
+function closeModal() {
+  document.getElementById("modal").style.display = "none"
+  document.getElementById("titleInput").value = ''
+  document.getElementById("contentInput").value = ''
+}
+function addBoard(){
+  fetch('/board/add', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+          title: document.getElementById("titleInput").value,
+          content: document.getElementById("contentInput").value,
+          user_id: 1
+      })
+  })
+  closeModal();
+  getList();
+}
+async function delBoard(board_id){
+  await fetch('/board/del/'+board_id, {  // 1번 게시글 삭제
+      method: 'DELETE'
+  })
+  getList();
+}
+</script>
+
+</body>
+</html>

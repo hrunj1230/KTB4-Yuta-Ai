@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>로그인</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="login-box">
+  <h1>커뮤니티 로그인</h1>
+
+  <input type="email" id="email" placeholder="이메일 입력" value="alice@test.com">
+
+  <button onclick="login()">로그인</button>
+</div>
+
+<script>
+async function login() {
+  const email = document.getElementById("email").value;
+  const res = await fetch("/user/login", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({email})
+  })
+  if (res.ok){
+    location.href = "/board";
+  }else{
+    alert("로그인 실패");
+  }
+}
+</script>
+
+</body>
+</html>
